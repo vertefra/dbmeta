@@ -1,0 +1,21 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+
+[project]
+name = "dbmeta"
+version = "0.0.3"
+authors = [
+    { name="Francesco Vertemati", email="verte.fra@gmail.com" }
+]
+description = "Inspect database schema, tables and columns and returns a metadata object"
+classifiers = [
+    "Programming Language :: Python :: 3",
+]
+
+dependencies = [
+    "psycopg>=3.1.4"
+]
+
+[project.urls]
