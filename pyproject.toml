@@ -10,6 +10,8 @@ authors = [
     { name="Francesco Vertemati", email="verte.fra@gmail.com" }
 ]
 description = "Inspect database schema, tables and columns and returns a metadata object"
+long_description = ""
+
 classifiers = [
     "Programming Language :: Python :: 3",
 ]
