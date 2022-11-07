@@ -1,7 +1,7 @@
 from psycopg import Connection
 from ..settings import config
 from .database import IDatabase, Schema, Table, Column
-from typing import Any, List
+from typing import List
 from psycopg.rows import dict_row
 from .exclude import exclude
 from .database import Metadata
@@ -34,14 +34,14 @@ class Postgres(IDatabase):
         sql = """
             SELECT column_name, data_type, udt_name::regtype, *
             FROM information_schema.columns 
-            WHERE table_schema = 'public'
+            WHERE table_schema = %s
             AND table_name=%s;
         """
 
         with self.__get_conn() as conn:
             db = conn.cursor()
 
-            db.execute(sql, (table.table_name,))
+            db.execute(sql, (table.table_schema, table.table_name))
             records = db.fetchall()
 
             columns = [Column(record) for record in records]
