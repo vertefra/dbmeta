@@ -4,6 +4,7 @@ from .settings import config
 
 _supported_databases = ["postgres"]
 
+
 class dbmeta:
     database: str
 

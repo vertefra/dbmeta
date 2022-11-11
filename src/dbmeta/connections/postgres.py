@@ -106,4 +106,7 @@ class Postgres(IDatabase):
         return all_tables
 
     def __get_conn(self) -> Connection:
+        if config.database_url is None:
+            raise Exception("No database_url found")
+
         return Connection.connect(config.database_url, row_factory=dict_row)

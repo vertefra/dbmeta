@@ -1,0 +1,3 @@
+FROM postgres:14
+
+ENV POSTGRES_HOST_AUTH_METHOD=trust

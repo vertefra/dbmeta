@@ -8,7 +8,7 @@ class IDatabase(ABC):
     exclude_schema: List[str] = []
 
     @abstractmethod
-    def inspect_database() -> "Metadata":
+    def inspect_database(self) -> "Metadata":
         ...
 
 

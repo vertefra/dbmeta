@@ -21,3 +21,18 @@ dependencies = [
 ]
 
 [project.urls]
+
+[project.optional-dependencies]
+test = [
+  "pytest==7.0.2",
+  "pydantic>=1.10.2"
+]
+
+lint = [
+    "mypy==0.990",
+    "black==22.10.0"
+]
+
+# mypy settings 
+[mypy]
+warn_return_any = true
