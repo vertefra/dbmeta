@@ -6,7 +6,7 @@ _supported_databases = ["postgres"]
 
 
 class dbmeta:
-    database: str
+    database: str | None = None
 
     @classmethod
     def gen_metadata(

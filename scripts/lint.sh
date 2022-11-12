@@ -1,3 +1,2 @@
-pip install .[lint] &&
-    black . && 
-    mypy .
+black .  
+mypy .

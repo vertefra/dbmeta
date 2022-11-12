@@ -40,33 +40,37 @@ class Postgres(IDatabase):
 
         with self.__get_conn() as conn:
             db = conn.cursor()
+            try:
+                db.execute(sql, (table.table_schema, table.table_name))
+                records = db.fetchall()
 
-            db.execute(sql, (table.table_schema, table.table_name))
-            records = db.fetchall()
+                columns = [Column(record) for record in records]
 
-            columns = [Column(record) for record in records]
-
-            table.columns = columns
-            return columns
+                table.columns = columns
+                return columns
+            finally:
+                db.close()
 
     def _query_schema(self) -> List[Schema]:
         with self.__get_conn() as conn:
             db = conn.cursor()
+            try:
+                db.execute(
+                    f""" 
+                    SELECT 
+                        * 
+                    FROM 
+                        information_schema.schemata 
+                    WHERE
+                        schema_name != ALL(%s) 
 
-            db.execute(
-                f""" 
-                SELECT 
-                    * 
-                FROM 
-                    information_schema.schemata 
-                WHERE
-                    schema_name != ALL(%s) 
+                """,
+                    (self.exclude_schema,),
+                )
 
-            """,
-                (self.exclude_schema,),
-            )
-
-            records = db.fetchall()
+                records = db.fetchall()
+            finally:
+                db.close()
 
             return [Schema(record) for record in records]
 
@@ -76,32 +80,35 @@ class Postgres(IDatabase):
 
         with self.__get_conn() as conn:
             db = conn.cursor()
+            try:
 
-            for _schema in schema:
-                db.execute(
-                    f"""
-                    SELECT 
-                        table_catalog,
-                        table_schema,
-                        table_name,
-                        table_type
-                    FROM 
-                        information_schema.tables
-                    WHERE
-                        table_schema = %s
-                    AND
-                        table_name != ALL( %s )
-                """,
-                    (_schema.schema_name, self.exclude_tables),
-                )
+                for _schema in schema:
+                    db.execute(
+                        f"""
+                        SELECT 
+                            table_catalog,
+                            table_schema,
+                            table_name,
+                            table_type
+                        FROM 
+                            information_schema.tables
+                        WHERE
+                            table_schema = %s
+                        AND
+                            table_name != ALL( %s )
+                    """,
+                        (_schema.schema_name, self.exclude_tables),
+                    )
 
-                records = db.fetchall()
+                    records = db.fetchall()
 
-                tables = [Table(record) for record in records]
+                    tables = [Table(record) for record in records]
 
-                _schema.tables = tables
+                    _schema.tables = tables
 
-                all_tables.extend(tables)
+                    all_tables.extend(tables)
+            finally:
+                db.close()
 
         return all_tables
 

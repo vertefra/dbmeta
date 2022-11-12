@@ -5,7 +5,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "dbmeta"
-version = "0.0.9"
+version = "0.0.10"
 authors = [
     { name="Francesco Vertemati", email="verte.fra@gmail.com" }
 ]
@@ -24,8 +24,10 @@ dependencies = [
 
 [project.optional-dependencies]
 test = [
-  "pytest==7.0.2",
-  "pydantic>=1.10.2"
+  "pytest==7.2.0",
+  "pytest-cov==4.0.0",
+  "pydantic>=1.10.2",
+  "psycopg>=3.1.4"
 ]
 
 lint = [
@@ -34,5 +36,6 @@ lint = [
 ]
 
 # mypy settings 
-[mypy]
+[tool.mypy]
 warn_return_any = true
+exclude = ["^tests/$", "^.venv/$"]

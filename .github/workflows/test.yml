@@ -1,11 +1,11 @@
-name: Lint and type check
+name: Tests
 
 on:
   push
 
 jobs:
-  build-n-lint:
-    name: Build and run linter and type check
+  build-n-test:
+    name: Build and run Tests
     runs-on: ubuntu-22.04
 
     steps:
@@ -15,7 +15,5 @@ jobs:
         with:
           python-version: "3.10"
       - name: Install Dependencies and run lint
-        run: |
-          pip install .[lint] && \
-            ./scripts/lint.sh
+        run: ./scripts/test.sh
         
