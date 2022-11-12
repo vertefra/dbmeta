@@ -24,8 +24,10 @@ dependencies = [
 
 [project.optional-dependencies]
 test = [
-  "pytest==7.0.2",
-  "pydantic>=1.10.2"
+  "pytest==7.2.0",
+  "pytest-cov==4.0.0",
+  "pydantic>=1.10.2",
+  "psycopg>=3.1.4"
 ]
 
 lint = [
@@ -36,3 +38,4 @@ lint = [
 # mypy settings 
 [mypy]
 warn_return_any = true
+exclude = [".venv", "tests"]
