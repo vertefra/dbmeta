@@ -36,6 +36,6 @@ lint = [
 ]
 
 # mypy settings 
-[mypy]
+[tool.mypy]
 warn_return_any = true
-exclude = [".venv", "tests"]
+exclude = ["^tests/$", "^.venv/$"]
