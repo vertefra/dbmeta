@@ -2,10 +2,10 @@ name: Tests
 
 on:
   push
-  
+
 jobs:
   build-n-test:
-    name: Build and run linter and type check
+    name: Build and run Tests
     runs-on: ubuntu-22.04
 
     steps:
