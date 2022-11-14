@@ -1,6 +1,6 @@
 from psycopg import Connection
 from ..settings import config
-from .database import IDatabase, Schema, Table, Column
+from .database import IDatabase, Schema, Table, Column, UserDefined
 from typing import List
 from psycopg.rows import dict_row
 from .exclude import exclude
@@ -17,9 +17,71 @@ class Postgres(IDatabase):
 
     def inspect_database(self) -> Metadata:
         schema = self._query_schema()
+        user_defined = self._query_custom_types()
         tables = self._query_tables(schema)
         columns = self._query_tables_columns(tables)
-        return Metadata(schema, tables, columns)
+
+        m = Metadata()
+        m.schema = schema
+        m.tables = tables
+        m.columns = columns
+        m.user_defined = user_defined
+
+        return m
+
+    def _query_custom_types(self) -> List[UserDefined]:
+        """Same query behind psql command `/dT+`"""
+        sql = f"""
+            SELECT 
+                n.nspname as "schema",
+                pg_catalog.format_type(t.oid, NULL) AS "name",
+                t.typname AS "internal_name",
+                CASE 
+                    WHEN t.typrelid != 0
+                        THEN CAST('tuple' AS pg_catalog.text)
+                    WHEN t.typlen < 0
+                        THEN CAST('var' AS pg_catalog.text)
+                    ELSE CAST(t.typlen AS pg_catalog.text)
+                END AS "size",
+                pg_catalog.array_to_string(
+                    ARRAY(
+                        SELECT e.enumlabel
+                        FROM pg_catalog.pg_enum e
+                        WHERE e.enumtypid = t.oid
+                        ORDER BY e.enumsortorder
+                    ),
+                    E'\n'
+                ) AS "elements",
+                pg_catalog.pg_get_userbyid(t.typowner) AS "owner",
+                pg_catalog.array_to_string(t.typacl, E'\n') AS "access_privileges",
+                pg_catalog.obj_description(t.oid, 'pg_type') as "description"
+            FROM 
+                pg_catalog.pg_type t
+            LEFT JOIN 
+                pg_catalog.pg_namespace n ON n.oid = t.typnamespace
+            WHERE (
+                    t.typrelid = 0 OR (
+                        SELECT c.relkind = 'c' FROM pg_catalog.pg_class c WHERE c.oid = t.typrelid
+                    )
+                )
+            AND NOT EXISTS (
+                SELECT 1 FROM pg_catalog.pg_type el WHERE el.oid = t.typelem AND el.typarray = t.oid
+            )
+            AND n.nspname <> 'pg_catalog'
+            AND n.nspname <> 'information_schema'
+            AND pg_catalog.pg_type_is_visible(t.oid)
+            ORDER BY 1, 2;
+        """
+
+        with self.__get_conn() as conn:
+            db = conn.cursor()
+            try:
+                db.execute(sql)
+                records = db.fetchall()
+
+                return [UserDefined(record) for record in records]
+            finally:
+                db.close()
 
     def _query_tables_columns(self, tables: List[Table]) -> List[Column]:
         all_columns: List[Column] = []

@@ -12,16 +12,10 @@ class IDatabase(ABC):
 
 
 class Metadata:
-    schema: List["Schema"]
-    tables: List["Table"]
-    columns: List["Column"]
-
-    def __init__(
-        self, schema: List["Schema"], tables: List["Table"], columns: List["Column"]
-    ) -> None:
-        self.schema = schema
-        self.tables = tables
-        self.columns = columns
+    schema: List["Schema"] = []
+    tables: List["Table"] = []
+    columns: List["Column"] = []
+    user_defined: List["UserDefined"] = []
 
 
 class DatabaseItem:
@@ -81,3 +75,16 @@ class Table(DatabaseItem):
 
     def __repr__(self) -> str:
         return f"<{self.table_name}>"
+
+
+class UserDefined(DatabaseItem):
+    schema: str
+    name: str
+    internal_name: str
+    elements: List[str | int]
+
+    def __init__(self, record: dict) -> None:
+        super().__init__(record)
+
+    def __repr__(self) -> str:
+        return f"<{self.internal_name}>"
