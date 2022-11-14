@@ -40,6 +40,7 @@ class Metadata:
     schema: List[Schema]
     tables: List[Table]
     columns: List[Column]
+    user_defined: List[UserDefined]
 
 ```
 
@@ -81,4 +82,14 @@ class Column(DatabaseItem):
 
 ```
 
+### User Defined Types
+
+```python
+class UserDefined(DatabaseItem):
+    schema: str
+    name: str
+    internal_name: str
+    elements: List[str | int]
+
+```
 
