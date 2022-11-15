@@ -1,4 +1,4 @@
-# dbmeta v0.0.11
+# dbmeta v0.0.12
 ## Database metadata extractor
 
 Generate a Metadata object containing information about the database.
